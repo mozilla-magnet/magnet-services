@@ -1,0 +1,32 @@
+#!/usr/bin/env node
+
+require('isomorphic-fetch');
+
+const payload = {
+  location: { lat: 51.483221, long: -0.010115 },
+  is_virtual: true,
+  short_id: 'test',
+  content_attachment: {
+    url: 'https://www.royalgreenwich.gov.uk/info/200102/walking/693/foot_tunnels',
+    calls_to_action: {
+      "Report a foot tunnel problem": "https://www.royalgreenwich.gov.uk/site/xfp/scripts/xforms_form.php?formID=161&language=en"
+    },
+    additional_metadata: {
+      'test': 'test'
+    }
+  }
+};
+
+const channelName = 'londonhistory';
+
+fetch(`http://localhost:3000/v1/channel/${channelName}/beacons`, {
+  method: 'POST',
+  headers: {
+    'Accept': 'application/json',
+    'Content-Type': 'application/json'
+  },
+  body: JSON.stringify(payload)
+}).then((response) => {
+  return response.json();
+}).then(console.log)
+.catch((e) => console.error(e));

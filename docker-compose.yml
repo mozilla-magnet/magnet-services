@@ -1,0 +1,9 @@
+version: '2'
+services:
+  db:
+    image: mdillon/postgis
+  content:
+    build:
+      context: ./content-service
+    depends_on:
+      - db
