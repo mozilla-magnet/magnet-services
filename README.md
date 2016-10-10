@@ -20,6 +20,14 @@ See [content-service/README](https://github.com/mozilla-magnet/magnet-services/t
 
 Locally exposed on `localhost:3000`.
 
+### Shortener Service (service name: `shortener`)
+
+See [magnet-shortener/README](https://github.com/mozilla-magnet/magnet-shortener)
+
+`docker-compose up shortener`
+
+Locally exposed on `localhost:3001`.
+
 # License
 
 All code licensed under the MPL-2.0 license.
