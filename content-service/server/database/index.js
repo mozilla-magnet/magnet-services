@@ -44,7 +44,17 @@ function createNewBeacon(channel, beaconData) {
     });
 }
 
+function searchBeacons(lat, long, radius) {
+  console.log('searching beacons');
+  const point = st.makePoint(lat, long);
+
+  return knex('beacon')
+    .select('channel_name', 'short_id', st.asGeoJSON('location'))
+    .where(st.dwithin('location', point, radius));
+}
+
 module.exports = {
   createNewBeacon: createNewBeacon,
   createNewChannel: createNewChannel,
+  searchBeacons: searchBeacons,
 };

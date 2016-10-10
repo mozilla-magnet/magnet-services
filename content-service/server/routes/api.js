@@ -60,11 +60,18 @@ router.get(/^\/v1\/channel\/(.*)\/beacons/, (req, res) => {
   res.json(req.params);
 });
 
-router.get(/^\/v1\/search\/beacons\/(.*),(.*),(.*)/, (req, res) => {
-  const latitude = req.params[0];
-  const longitude = req.params[1];
-  const radius = req.params[2];
-  res.json(req.params);
+router.get(/^\/v1\/search\/beacons\/(.*),(.*),(.*)\/?$/, (req, res) => {
+  const latitude = Number(req.params[0]);
+  const longitude = Number(req.params[1]);
+  const radius = Number(req.params[2]);
+
+  return database.searchBeacons(latitude, longitude, radius)
+    .then((dbResponse) => {
+      res.json(dbResponse);
+    }).catch((err) => {
+      res.status(400);
+      res.json(err);
+    });
 });
 
 module.exports = router;
