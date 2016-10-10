@@ -35,7 +35,7 @@ Creates a new `channel`.
 
 Body must be content type `application/json` and contain the following fields:
 
-```JSON
+```JS
 {
   name: '<unique name of channel>',
   email: '<unique email address>',
@@ -52,7 +52,7 @@ Creates a new `beacon` resource.
 Body must be content type `application/json` and contain the following fields
 (see comments for optional fields):
 
-```JSON
+```JS
 {
   location: { lat: <number>, long: <number> }, // Optional unless is_virtual is
   true
