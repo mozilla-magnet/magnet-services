@@ -57,7 +57,7 @@ Body must be content type `application/json` and contain the following fields
   location: { lat: <number>, long: <number> }, // Optional unless is_virtual is
   true
   is_virtual: <boolean>,
-  short_id: <string>, // Optional: Will assign this as the shortend ID for this beacon, if omitted, a new one will be generated.
+  short_id: <string>, // Optional: Will assign this as the shortened ID for this beacon, if omitted, a new one will be generated.
   content_attachment: {
     url: <string>,
     calls_to_action: {
