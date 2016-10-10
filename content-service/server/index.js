@@ -6,6 +6,7 @@ const ONE_DAY = 60 * 60 * 24;
 const ONE_YEAR = ONE_DAY * 365;
 
 app.use(morgan('combined'));
+
 app.use((req, res, next) => {
   res.set('Strict-Transport-Security', `max-age=${ONE_DAY}; includeSubDomains`);
   res.removeHeader('x-powered-by');

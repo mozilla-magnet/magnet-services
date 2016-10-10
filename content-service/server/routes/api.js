@@ -55,7 +55,7 @@ router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
     });
 });
 
-router.get(/^\/v1\/channel\/(.*)\/beacons/, (req, res) => {
+router.get(/^\/v1\/channel\/(.*)\/beacons\/?$/, (req, res) => {
   const channelName = req.params[0];
   res.json(req.params);
 });

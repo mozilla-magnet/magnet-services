@@ -58,7 +58,6 @@ const commands = {
       const payload = {
         location: {  long: Number(String(args[1]).replace('_', '-')), lat: Number(String(args[2]).replace('_', '-')) },
         is_virtual: true,
-        short_id: 'test',
         content_attachment: {
           url: args[3],
           calls_to_action: {},

@@ -1,6 +1,8 @@
 const environment = process.env.ENV || 'dev';
 const dbConfig = require('../../database.json')[environment];
 
+const shortId = require('../utils/shortid');
+
 const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
@@ -35,12 +37,13 @@ function createNewBeacon(channel, beaconData) {
   return knex('beacon')
     .insert({
       channel_name: channel.trim(),
-      short_id: beaconData.short_id,
       canonical_url: beaconData.content_attachment.url,
       call_to_action: JSON.stringify(beaconData.content_attachment.calls_to_action),
       extra_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata),
       location: st.geography(st.makePoint(beaconData.location.long, beaconData.location.lat)),
       is_virtual: beaconData.is_virtual
+    }, 'id').then((dbResponse) => {
+      return { id: dbResponse[0], shortId: shortId.numToShortId(dbResponse[0]) };
     });
 }
 
@@ -49,7 +52,7 @@ function searchBeacons(lat, long, radius) {
   const point = st.makePoint(lat, long);
 
   return knex('beacon')
-    .select('channel_name', 'short_id', st.asGeoJSON('location'))
+    .select('channel_name', 'id', st.asGeoJSON('location'))
     .where(st.dwithin('location', point, radius));
 }
 
