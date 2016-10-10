@@ -33,6 +33,7 @@ router.post(/^\/v1\/channel/,
       res.json(dbResponse);
     })
     .catch((err) => {
+      res.status(400);
       res.json(err);
     });
 });

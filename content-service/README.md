@@ -1,5 +1,9 @@
 # Content Service
 
+TO run locally for dev: `npm run-script start-dev`. Make sure the database is
+up or configured in `databsae.json`, see the top level README for starting the
+databse.
+
 ## API
 
 #### POST /v1/channel

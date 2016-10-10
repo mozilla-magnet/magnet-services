@@ -22,6 +22,13 @@ function createNewChannel(channelInfo) {
       name: channelInfo.name,
       email: channelInfo.email,
       tags: channelInfo.tags || '',
+    })
+    .then((dbResponse) => {
+      return { created: channelInfo.name };
+    }).catch((err) => {
+      throw {
+        message: err.detail
+      };
     });
 }
 
