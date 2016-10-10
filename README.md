@@ -8,6 +8,8 @@ Exposed on `localhost:5432`.
 
 ### Content Service
 
+See [content-service/README](content-services/README.md)
+
 `docker-compose up content`
 
 Exposed on `localhost:3000`.
