@@ -18,3 +18,12 @@ services:
       - db
     ports:
       - "3000:3000"
+  shortener:
+    build:
+      context: ./magnet-shortener
+    depends_on:
+      - content
+    links:
+      - content
+    ports:
+      - "3001:8080"

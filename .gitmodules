@@ -1,0 +1,3 @@
+[submodule "magnet-shortener"]
+	path = magnet-shortener
+	url = git@github.com:mozilla-magnet/magnet-shortener.git
