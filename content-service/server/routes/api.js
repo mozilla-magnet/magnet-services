@@ -22,7 +22,7 @@ passport.use(new LocalApiKeyStrategy({
   }
 ));
 
-router.post(/^\/v1\/channel/,
+router.post(/^\/v1\/channel\/?$/,
   passport.authenticate('localapikey', { session: false }),
   (req, res) => {
 
@@ -38,14 +38,21 @@ router.post(/^\/v1\/channel/,
     });
 });
 
-router.post(/^\/v1\/channel\/(.*)\/beacons/,
+router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
   passport.authenticate('localapikey', { session: false }),
   (req, res) => {
   const channelName = req.params[0];
   const requestBody = req.body;
-  console.log(requestBody);
+  console.log('body=' + requestBody);
   console.log(`channelName=${channelName}`);
-  res.json(requestBody)
+  return database.createNewBeacon(channelName, requestBody)
+    .then((dbResponse) => {
+      res.json(dbResponse);
+    })
+    .catch((err) => {
+      res.status(400);
+      res.json(err);
+    });
 });
 
 router.get(/^\/v1\/channel\/(.*)\/beacons/, (req, res) => {

@@ -7,7 +7,7 @@ CREATE TABLE channel (
 CREATE INDEX channel_name_index ON channel(name);
 
 CREATE TABLE beacon (
-  id BIGINT PRIMARY KEY,
+  id SERIAL PRIMARY KEY,
   channel_name TEXT REFERENCES channel(name),
   short_id VARCHAR(8) UNIQUE,
   canonical_url TEXT,

@@ -1,7 +1,6 @@
 const environment = process.env.ENV || 'dev';
 const dbConfig = require('../../database.json')[environment];
 
-
 const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
@@ -13,7 +12,6 @@ const knex = (function createPool() {
 }());
 
 const st = require('knex-postgis')(knex);
-
 
 function createNewChannel(channelInfo) {
   console.log(channelInfo);
@@ -33,20 +31,20 @@ function createNewChannel(channelInfo) {
 }
 
 function createNewBeacon(channel, beaconData) {
+  console.log('creating new beacon');
   return knex('beacon')
     .insert({
-      channel_name: channel,
-      // TODO generate unique shortId if not specified
-      short_id: beaconData.shortId,
+      channel_name: channel.trim(),
+      short_id: beaconData.short_id,
       canonical_url: beaconData.content_attachment.url,
       call_to_action: JSON.stringify(beaconData.content_attachment.calls_to_action),
-      additional_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata),
+      extra_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata),
       location: st.geography(st.makePoint(beaconData.location.long, beaconData.location.lat)),
       is_virtual: beaconData.is_virtual
     });
 }
 
 module.exports = {
-  createNewBeacon,
-  createNewChannel,
+  createNewBeacon: createNewBeacon,
+  createNewChannel: createNewChannel,
 };

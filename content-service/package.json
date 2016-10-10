@@ -25,11 +25,11 @@
     "isomorphic-fetch": "^2.2.1",
     "knex": "^0.12.3",
     "knex-postgis": "^0.2.0",
-    "minimist": "^1.2.0",
     "morgan": "^1.7.0",
     "passport": "^0.3.2",
     "passport-google-oauth": "^1.0.0",
-    "passport-localapikey-update": "^0.5.0"
+    "passport-localapikey-update": "^0.5.0",
+    "yargs": "^6.0.0"
   },
   "devDependencies": {
     "mocha": "^3.1.0",
