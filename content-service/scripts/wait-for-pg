@@ -31,7 +31,9 @@ function tryConnect() {
           reject('timed out');
         } else {
           console.log('trying again');
-          resolve(tryConnect());
+          setTimeout(function() {
+            resolve(tryConnect());
+          }, 1000);
         }
       }
     });

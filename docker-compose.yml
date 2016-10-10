@@ -4,8 +4,11 @@ services:
     image: mdillon/postgis
     environment:
       POSTGRES_DB: content-service
+      PGDATA: /var/lib/postgresql/data/pgdata
     ports:
       - "5432:5432"
+    volumes:
+      - ./data/postgresql:/var/lib/postgresql/data/pgdata
   content:
     build:
       context: ./content-service

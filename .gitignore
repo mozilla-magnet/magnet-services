@@ -1,3 +1,6 @@
 node_modules/
 content-service/config.json
 npm-debug.log
+
+data/
+!data/.datadir
