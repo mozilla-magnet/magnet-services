@@ -49,3 +49,5 @@ TODO: Pagination
 
 Get a list of all beacons within a certain radius of the given latitude and
 longitude.
+
+TODO: Pagination
