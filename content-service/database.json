@@ -2,8 +2,15 @@
   "dev": {
     "driver": "pg",
     "user": "postgres",
-    "password": "",
+    "password": "postgres",
     "host": "db",
-    "database": "content_db"
+    "database": "content-service"
+  },
+  "local": {
+    "driver": "pg",
+    "user": "postgres",
+    "password": "postgres",
+    "host": "localhost",
+    "database": "content-service"
   }
 }

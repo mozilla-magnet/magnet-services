@@ -1,32 +1,100 @@
 #!/usr/bin/env node
-
 require('isomorphic-fetch');
+const argv = require('minimist')(process.argv.slice(2));
 
-const payload = {
-  location: { lat: 51.483221, long: -0.010115 },
-  is_virtual: true,
-  short_id: 'test',
-  content_attachment: {
-    url: 'https://www.royalgreenwich.gov.uk/info/200102/walking/693/foot_tunnels',
-    calls_to_action: {
-      "Report a foot tunnel problem": "https://www.royalgreenwich.gov.uk/site/xfp/scripts/xforms_form.php?formID=161&language=en"
+if (!argv.apikey) {
+  console.error('Must specify --apikey');
+  process.exit(1);
+}
+
+const API_KEY = argv.apikey;
+
+const commands = {
+  'create': {
+    'channel': function(args) {
+      if (!args[0] || !args[1]) {
+        console.error('Required args: <name> <email> <optional:tags>');
+        process.exit(1);
+        return;
+      }
+
+      const payload = {
+        name: args[0],
+        email: args[1],
+        tags: args[2] || ''
+      };
+
+      apiCall('http://localhost:3000/v1/channel', payload);
     },
-    additional_metadata: {
-      'test': 'test'
+    'beacon': function(args) {
     }
   }
 };
 
-const channelName = 'londonhistory';
+const command = argv._[0];
 
-fetch(`http://localhost:3000/v1/channel/${channelName}/beacons`, {
-  method: 'POST',
-  headers: {
-    'Accept': 'application/json',
-    'Content-Type': 'application/json'
-  },
-  body: JSON.stringify(payload)
-}).then((response) => {
-  return response.json();
-}).then(console.log)
-.catch((e) => console.error(e));
+if (!command) {
+  console.log('Usage: ./data-tool <command> <type> <...args>');
+  console.log('Available commands: ' + Object.keys(commands));
+  console.error(`Unknown command '${command}'`);
+  process.exit(1);
+}
+
+const type = argv._[1];
+
+if (!commands[command][type]) {
+  console.log(`Usage: ./data-local ${command} <type> <...args>`);
+  console.log('Available types: ' + Object.keys(commands[command]).join(', '));
+  console.error(`Unkown type '${type}'`);
+  process.exit(1);
+}
+
+commands[command][type](argv._.slice(2));
+
+function addBeacon() {
+  const payload = {
+    location: { lat: 51.483221, long: -0.010115 },
+    is_virtual: true,
+    short_id: 'test',
+    content_attachment: {
+      url: 'https://www.royalgreenwich.gov.uk/info/200102/walking/693/foot_tunnels',
+      calls_to_action: {
+        "Report a foot tunnel problem": "https://www.royalgreenwich.gov.uk/site/xfp/scripts/xforms_form.php?formID=161&language=en"
+      },
+      additional_metadata: {
+        'test': 'test'
+      }
+    }
+  };
+
+  const channelName = 'londonhistory';
+
+  fetch(`http://localhost:3000/v1/channel/${channelName}/beacons`, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-ApiKey': API_KEY
+    },
+    body: JSON.stringify(payload)
+  }).then((response) => {
+    console.log(response);
+    return response.text();
+  }).then(console.log)
+  .catch((e) => console.error(e));
+}
+
+function apiCall(endpoint, payload) {
+  fetch(endpoint, {
+    method: 'POST',
+    headers: {
+      'Accept': 'application/json',
+      'Content-Type': 'application/json',
+      'X-ApiKey': API_KEY
+    },
+    body: JSON.stringify(payload)
+  }).then((response) => {
+    return response.text();
+  }).then(console.log)
+  .catch((e) => console.error(e));
+}

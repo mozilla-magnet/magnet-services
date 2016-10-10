@@ -2,8 +2,16 @@ version: '2'
 services:
   db:
     image: mdillon/postgis
+    environment:
+      POSTGRES_DB: content-service
+    ports:
+      - "5432:5432"
   content:
     build:
       context: ./content-service
     depends_on:
       - db
+    links:
+      - db
+    ports:
+      - "3000:3000"

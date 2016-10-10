@@ -2,7 +2,13 @@
 
 ## API
 
+#### POST /v1/channel
+
+Authenticate with an api key set in the `X-ApiKey` header.
+
 #### POST /v1/channel/<name>/beacons
+
+Authenticate with an api key set in the `X-ApiKey` header.
 
 Creates a new `beacon` resource.
 
@@ -35,7 +41,7 @@ Get a list of all beacons belonging to this channel.
 
 TODO: Pagination
 
-#### GET /v1/search/<latitude>,<longitude>,<radius>
+#### GET /v1/search/beacons/<latitude>,<longitude>,<radius>
 
 Get a list of all beacons within a certain radius of the given latitude and
 longitude.
