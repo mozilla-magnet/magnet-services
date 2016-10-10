@@ -5,11 +5,11 @@ const environment = process.env.ENV || 'dev';
 console.log(`Launching database from ${environment}`);
 const dbConfig = require('../database.json')[environment];
 
-const client = new pg.Client(dbConfig);
 
 let timedOut = false;
 
 function timeout(seconds) {
+  console.log('timeout started');
   setTimeout(function() {
     timedOut = true;
   }, seconds * 1000);
@@ -18,16 +18,20 @@ function timeout(seconds) {
 
 function tryConnect() {
   return new Promise((resolve, reject) => {
+    console.log('trying connection...');
+    const client = new pg.Client(dbConfig);
     client.connect(function(err) {
       if (!err) {
         console.log("Connected");
         resolve();
       } else {
+        console.log('connect error...');
         if (timedOut) {
+          console.log('timed out');
           reject('timed out');
         } else {
           console.log('trying again');
-          tryConnect();
+          resolve(tryConnect());
         }
       }
     });
@@ -35,7 +39,7 @@ function tryConnect() {
 }
 
 (function start() {
-  timeout(30);
+  timeout(300);
   tryConnect()
   .then(() => {
     process.exit(0);
