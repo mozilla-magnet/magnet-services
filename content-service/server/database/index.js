@@ -3,6 +3,8 @@ const dbConfig = require('../../database.json')[environment];
 
 const shortId = require('../utils/shortid');
 
+const HttpError = require('../express/httperror');
+
 const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
@@ -56,8 +58,23 @@ function searchBeacons(lat, long, radius) {
     .where(st.dwithin('location', point, radius));
 }
 
+function getCanonicalUrlForShortId(id) {
+  console.log(shortId);
+  return knex('beacon')
+    .select('channel_name', 'canonical_url')
+    .where('id', shortId.shortIdToNum(id))
+    .then((response) => {
+      if (response.length > 0) {
+        return response[0];
+      }
+
+      throw new HttpError(404, `Could not find short url: ${id}`, 'ENOTFOUND');
+    });
+}
+
 module.exports = {
-  createNewBeacon: createNewBeacon,
-  createNewChannel: createNewChannel,
-  searchBeacons: searchBeacons,
+  createNewBeacon,
+  createNewChannel,
+  searchBeacons,
+  getCanonicalUrlForShortId,
 };
