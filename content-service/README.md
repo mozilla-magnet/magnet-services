@@ -83,3 +83,13 @@ Get a list of all beacons within a certain radius of the given latitude and
 longitude.
 
 TODO: Pagination
+
+#### GET `/v1/search/shortid/:slug`
+
+Get the canonical URL for a given slug
+
+Returns `application/json`:
+
+```JS
+{ channl_name: '<channel_name>', canonical_url: '<url>' }
+```
