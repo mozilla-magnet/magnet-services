@@ -56,7 +56,7 @@ router.get(/^\/v1\/channel\/(.*)\/beacons\/?$/, createRouteHandler((req, res) =>
 router.post(/^\/v1\/search\/beacons\/?$/, createRouteHandler((req, res) => {
 }));
 
-router.get(/^\/v1\/search\/shortid\/(.*)\/?$/, createRouteHandler((req, res) => {
+router.get(/^\/v1\/search\/shortid\/([a-zA-Z0-9_\-~]*)\/?$/, createRouteHandler((req, res) => {
   const shortId = req.params[0];
 
   return database.getCanonicalUrlForShortId(shortId)
