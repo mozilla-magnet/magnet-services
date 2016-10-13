@@ -113,12 +113,10 @@ Example:
 {
   "1": false,
   "1lm": {
-    "slug": "1lm",
     "channel_name": "londontest",
     "location": { "latitude": 10.23123, "longitude": 50.12311 }
   },
   "123dq": {
-    "slug": "123dq",
     "channel_name": "londonstuff",
     "location": { "latitude": 2.12313, "longitude": 0.43563 }
   }
