@@ -28,6 +28,12 @@ See [magnet-shortener/README](https://github.com/mozilla-magnet/magnet-shortener
 
 Locally exposed on `localhost:3001`.
 
+## Deploying to Production
+
+1. Head to the 'production' server and switch to the 'metadataservice' user.
+2. Enter the `magnet-services` directory and do a git pull.
+3. Run `docker-compose up -d --force-recreate --build <... list of service names to restart>`
+
 # License
 
 All code licensed under the MPL-2.0 license.
