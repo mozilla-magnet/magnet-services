@@ -40,8 +40,8 @@ function createNewBeacon(channel, beaconData) {
     .insert({
       channel_name: channel.trim(),
       canonical_url: beaconData.content_attachment.url,
-      call_to_action: JSON.stringify(beaconData.content_attachment.calls_to_action),
-      extra_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata),
+      call_to_action: JSON.stringify(beaconData.content_attachment.calls_to_action || {}),
+      extra_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata || {}),
       location: st.geography(st.makePoint(beaconData.location.long, beaconData.location.lat)),
       is_virtual: beaconData.is_virtual
     }, 'id').then((dbResponse) => {
