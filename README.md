@@ -28,6 +28,14 @@ See [magnet-shortener/README](https://github.com/mozilla-magnet/magnet-shortener
 
 Locally exposed on `localhost:3001`.
 
+### Metadata Service (service name: `metadata`)
+
+See [magnet-metadata-service](https://github.com/mozilla-magnet/magnet-shortener)
+
+`docker-compose up metadata`
+
+Locally exposed on `localhost:3002`
+
 ## Deploying to Production
 
 1. Head to the 'production' server and switch to the 'metadataservice' user.
