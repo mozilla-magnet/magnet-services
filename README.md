@@ -40,7 +40,7 @@ Locally exposed on `localhost:3002`
 
 1. Head to the 'production' server and switch to the 'metadataservice' user.
 2. Enter the `magnet-services` directory and do a git pull.
-3. Run `./update-prod.sh <... list of service names to restart>`
+3. Run `./update-prod.sh <... space separated list of service names to restart>`
 
 # License
 
