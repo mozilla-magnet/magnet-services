@@ -51,11 +51,26 @@ function createNewBeacon(channel, beaconData) {
 
 function searchBeacons(lat, long, radius) {
   console.log('searching beacons');
-  const point = st.makePoint(lat, long);
+
+  // ST_MakePoint is (x,y) so reverse conventional 'lat, long' to 'long, lat'
+  const point = st.makePoint(long, lat);
 
   return knex('beacon')
     .select('channel_name', 'id', st.asGeoJSON('location'))
-    .where(st.dwithin('location', point, radius));
+    .where(st.dwithin('location', point, radius))
+    .then((dbResponse) => {
+      return dbResponse.map((entry) => {
+        const parsedGeoJson = JSON.parse(entry.location);
+        return {
+          slug: shortId.numToShortId(entry.id),
+          channel_name: entry.channel_name,
+          location: {
+            latitude: parsedGeoJson.coordinates[1],
+            longitude: parsedGeoJson.coordinates[0],
+          }
+        };
+      });
+    });
 }
 
 function getCanonicalUrlForShortId(id) {
