@@ -93,3 +93,34 @@ Returns `application/json`:
 ```JS
 { channl_name: '<channel_name>', canonical_url: '<url>' }
 ```
+
+#### POST `/v1/search/slugs`
+
+Get information for a list of `slugs`.
+
+Post a JSON encoded array of slugs (`application/json`)
+
+```JS
+["1", "1lm", "123dq"]
+```
+
+Responds with `application/json` matching requested slugs to an object, with
+its information, or `false` if the slug is unknown.
+
+Example:
+
+```JS
+{
+  "1": false,
+  "1lm": {
+    "slug": "1lm",
+    "channel_name": "londontest",
+    "location": { "latitude": 10.23123, "longitude": 50.12311 }
+  },
+  "123dq": {
+    "slug": "123dq",
+    "channel_name": "londonstuff",
+    "location": { "latitude": 2.12313, "longitude": 0.43563 }
+  }
+}
+```

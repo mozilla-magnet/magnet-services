@@ -1,5 +1,5 @@
 const environment = process.env.ENV || 'dev';
-const dbConfig = require('../../database.json')[environment];
+const dbConfig = require('../../database.json')[environment.trim().toLowerCase()];
 
 const shortId = require('../utils/shortid');
 
@@ -9,7 +9,7 @@ const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
     connection: dbConfig,
-    pool: { min: 3, max: 10 }
+    pool: { min: 1, max: 10 }
   });
 
   return knex;
@@ -58,7 +58,6 @@ function createNewBeacon(channel, beaconData) {
 }
 
 function searchBeacons(lat, long, radius) {
-  console.log('searching beacons');
 
   // ST_MakePoint is (x,y) so reverse conventional 'lat, long' to 'long, lat'
   const point = st.makePoint(long, lat);
@@ -81,6 +80,33 @@ function searchBeacons(lat, long, radius) {
     });
 }
 
+function searchSlugs(slugs) {
+  const resultsToReturn = slugs.reduce((obj, slug) => {
+    obj[slug] = false;
+    return obj;
+  }, {});
+
+  return knex('beacon')
+    .select('channel_name', 'id', st.asGeoJSON('location'))
+    .whereIn('id', slugs.map(shortId.shortIdToNum))
+    .then((dbResponse) => {
+      dbResponse.forEach((entry) => {
+        const parsedGeoJson = JSON.parse(entry.location);
+        const slug = shortId.numToShortId(entry.id);
+        resultsToReturn[slug] = {
+          slug: slug,
+          channel_name: entry.channel_name,
+          location: {
+            latitude: parsedGeoJson.coordinates[1],
+            longitude: parsedGeoJson.coordinates[0],
+          }
+        };
+      });
+
+      return resultsToReturn;
+    });
+};
+
 function getCanonicalUrlForShortId(id) {
   console.log(shortId);
   return knex('beacon')
@@ -100,4 +126,5 @@ module.exports = {
   createNewChannel,
   searchBeacons,
   getCanonicalUrlForShortId,
+  searchSlugs,
 };

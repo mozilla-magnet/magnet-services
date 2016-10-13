@@ -7,7 +7,6 @@ module.exports = function(err, req, res, next) {
   };
 
   let statusCode = 500;
-
   if (res.headersSent) {
     res.end();
     return;
@@ -17,15 +16,13 @@ module.exports = function(err, req, res, next) {
     statusCode = err.statusCode;
   }
 
-
   let msg = '' + (err.message || err);
 
   if ('string' === typeof err.details) {
     msg += '\n' + err.details;
   }
 
-
-  if (process.env.ENV === 'dev') {
+  if (process.env.ENV.trim().toLowerCase() === 'dev') {
     msg += '\n\n===========================================================\n';
     msg += 'Stack (shown because ENV=dev):\n\n' + (err.stack || 'no stacktrace available ');
   }

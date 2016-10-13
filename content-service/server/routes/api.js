@@ -77,4 +77,13 @@ router.get(/^\/v1\/search\/beacons\/(.*),(.*),(.*)\/?$/, createRouteHandler((req
     });
 }));
 
+router.post(/^\/v1\/search\/slugs\/?$/, createRouteHandler((req, res) => {
+  const requestBody = req.body;
+
+  return database.searchSlugs(requestBody)
+    .then((response) => {;
+      res.json(response);
+    });
+}));
+
 module.exports = router;
