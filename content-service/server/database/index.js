@@ -94,7 +94,6 @@ function searchSlugs(slugs) {
         const parsedGeoJson = JSON.parse(entry.location);
         const slug = shortId.numToShortId(entry.id);
         resultsToReturn[slug] = {
-          slug: slug,
           channel_name: entry.channel_name,
           location: {
             latitude: parsedGeoJson.coordinates[1],
