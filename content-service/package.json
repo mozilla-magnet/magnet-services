@@ -7,7 +7,7 @@
     "prestart": "scripts/wait-for-pg && db-migrate up",
     "start": "bin/service",
     "test": "mocha",
-    "start-dev": "nodemon bin/service"
+    "start-dev": "ENV=DEV nodemon bin/service"
   },
   "keywords": [
     "Content",

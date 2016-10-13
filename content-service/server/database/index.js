@@ -36,6 +36,14 @@ function createNewChannel(channelInfo) {
 
 function createNewBeacon(channel, beaconData) {
   console.log('creating new beacon');
+  if (!beaconData) {
+    throw new HttpError(400, 'Beacon data not specified in the request body', 'EINVAL');
+  }
+
+  if (!beaconData.content_attachment) {
+    throw new HttpError(400, 'Beacon data does not specify a \'content_attachment\'.', 'EINVAL');
+  }
+
   return knex('beacon')
     .insert({
       channel_name: channel.trim(),
