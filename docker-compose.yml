@@ -27,3 +27,8 @@ services:
       - content
     ports:
       - "3001:8080"
+  metadata:
+    build:
+      context: ./magnet-metadata-service
+    ports:
+      - "3002:3000"

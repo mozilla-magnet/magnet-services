@@ -1,3 +1,6 @@
 [submodule "magnet-shortener"]
 	path = magnet-shortener
 	url = git@github.com:mozilla-magnet/magnet-shortener.git
+[submodule "magnet-metadata-service"]
+	path = magnet-metadata-service
+	url = git@github.com:mozilla-magnet/magnet-metadata-service.git
