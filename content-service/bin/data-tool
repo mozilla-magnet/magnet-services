@@ -48,15 +48,18 @@ const commands = {
     'beacon': function(args) {
       console.log(args);
       if (!args[0] || !args[1] || !args[2] || !args[3]) {
-        console.error('Required args: <channelname> <longitude> <latitude> <url>');
-        console.error('Replace the negative symbol with an underscore for lat long');
+        console.error('Required args: <channelname> <latitude> <longitude> <url>');
+        console.error('Replace the negative symbol with an underscore for lat lon');
         process.exit(1);
         return;
       }
 
       const channelName = args[0];
       const payload = {
-        location: {  long: Number(String(args[1]).replace('_', '-')), lat: Number(String(args[2]).replace('_', '-')) },
+        location: {
+          lat: Number(String(args[1]).replace('_', '-')),
+          long: Number(String(args[2]).replace('_', '-'))
+        },
         is_virtual: true,
         content_attachment: {
           url: args[3],
