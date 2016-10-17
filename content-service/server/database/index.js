@@ -65,6 +65,7 @@ function searchBeacons(lat, long, radius) {
   return knex('beacon')
     .select('channel_name', 'id', st.asGeoJSON('location'))
     .where(st.dwithin('location', point, radius))
+    .limit(100)
     .then((dbResponse) => {
       return dbResponse.map((entry) => {
         const parsedGeoJson = JSON.parse(entry.location);
@@ -81,6 +82,19 @@ function searchBeacons(lat, long, radius) {
 }
 
 function searchSlugs(slugs) {
+
+  if (!Array.isArray(slugs)) {
+    throw new HttpError(400, 'Request body must be an array', 'EINVAL');
+  }
+
+  if (slugs.length > 100) {
+    throw new HttpError(400, 'Request body too large (limit of 100 items)', 'E2BIG');
+  }
+
+  if (slugs.length === 0) {
+    return Promise.resolve({});
+  }
+
   const resultsToReturn = slugs.reduce((obj, slug) => {
     obj[slug] = false;
     return obj;
@@ -111,6 +125,7 @@ function getCanonicalUrlForShortId(id) {
   return knex('beacon')
     .select('channel_name', 'canonical_url')
     .where('id', shortId.shortIdToNum(id))
+    .limit(1)
     .then((response) => {
       if (response.length > 0) {
         return response[0];
