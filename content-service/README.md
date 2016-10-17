@@ -122,3 +122,15 @@ Example:
   }
 }
 ```
+
+#### GET `/v1/search/allbeacons`
+
+Must be authenticated with an API key in the header `X-ApiKey`.
+
+Returns a GeoJSON format `FeatureCollection` object containing all points in
+the database.
+
+Responds with `application/json`.
+
+A good way to visualise this is to create a GitHub Gist with the `geojson` file
+extension, it will then be rendered for you.
