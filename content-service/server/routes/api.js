@@ -86,4 +86,14 @@ router.post(/^\/v1\/search\/slugs\/?$/, createRouteHandler((req, res) => {
     });
 }));
 
+router.get(/^\/v1\/search\/allbeacons\/?$/,
+  passport.authenticate('localapikey', { session: false }),
+  createRouteHandler((req, res) => {
+
+  return database.getAllPointsInDatabase()
+    .then((response) => {
+      res.json(response);
+    });
+}));
+
 module.exports = router;

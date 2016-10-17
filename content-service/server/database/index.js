@@ -120,10 +120,39 @@ function getCanonicalUrlForShortId(id) {
     });
 }
 
+/*
+ * Returns a geojson representation of every point in the database,
+ * must be authenticated, might take a while!
+ */
+function getAllPointsInDatabase() {
+  return knex('beacon')
+    .select('canonical_url', 'channel_name', st.asGeoJSON('location'))
+    .then((response) => {
+      return response.map((entry) => {
+        return {
+          type: 'Feature',
+          properties: {
+            url: entry.canonical_url,
+            channel: entry.channel_name
+          },
+          geometry: JSON.parse(entry.location)
+        };
+      });
+      return response;
+    })
+    .then((features) => {
+      return {
+        type: 'FeatureCollection',
+        features,
+      };
+    });
+}
+
 module.exports = {
   createNewBeacon,
   createNewChannel,
   searchBeacons,
   getCanonicalUrlForShortId,
   searchSlugs,
+  getAllPointsInDatabase,
 };
