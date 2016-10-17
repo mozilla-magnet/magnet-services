@@ -1,5 +1,7 @@
 const HttpError = require('./httperror');
 
+const isDevEnv = (process.env.ENV || '').trim().toLowerCase() === 'dev';
+
 module.exports = function(err, req, res, next) {
   const headers = {
     'Content-Type': 'text/plain;charset=UTF-8',
@@ -22,7 +24,7 @@ module.exports = function(err, req, res, next) {
     msg += '\n' + err.details;
   }
 
-  if (process.env.ENV.trim().toLowerCase() === 'dev') {
+  if (isDevEnv) {
     msg += '\n\n===========================================================\n';
     msg += 'Stack (shown because ENV=dev):\n\n' + (err.stack || 'no stacktrace available ');
   }
