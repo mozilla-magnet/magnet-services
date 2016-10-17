@@ -6,23 +6,15 @@ module.exports = function acao(config) {
       const originAllowed = acaoHosts.has(origin);
 
       console.log('checking cors');
+      console.log(callback.toString());
       callback(originAllowed ? null : 'Bad Request', originAllowed);
     },
-    optionsSuccessStatus: 200
+    optionsSuccessStatus: 200,
+    credentials: true,
+    exposedHeaders: ['content-type', 'content-range']
   };
 
   const corsHandler = cors(corsOptions);
 
-  return function(req, res, next) {
-    const origin = req.get('origin');
-    if (origin) {
-      if (acaoHosts.has(origin)) {
-        res.set('Access-Control-Allow-Credentials', true);
-      }
-
-      return corsHandler(req, res, next);
-    }
-
-    next();
-  };
+  return corsHandler;
 };

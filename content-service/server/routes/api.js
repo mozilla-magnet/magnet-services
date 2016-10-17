@@ -44,8 +44,8 @@ router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
   const channelName = req.params[0];
   const requestBody = req.body;
   return database.createNewBeacon(channelName, requestBody)
-    .then((dbResponse) => {
-      res.json(dbResponse);
+    .then((beacons) => {
+      res.json(beacons);
     });
 
 }));
@@ -63,6 +63,7 @@ router.get(/^\/v1\/channel\/(.*)\/beacons\/?$/, createRouteHandler((req, res) =>
       });
     })
     .then((beacons) => {
+      res.set('Content-Range', `0-${beacons.length}/${beacons.length}`);
       res.json(beacons);
     });
 }));
@@ -108,6 +109,7 @@ router.get(/^\/v1\/search\/beacons\/(.*),(.*),(.*)\/?$/, createRouteHandler((req
 
   return database.searchBeacons(latitude, longitude, radius)
     .then((dbResponse) => {
+      res.set('x-total-count', dbResponse.length);
       res.json(dbResponse);
     });
 }));
