@@ -12,22 +12,21 @@ const database = require('../database');
 router.use(bodyParser.json());
 router.use(acaoHandler(config));
 
-const LocalApiKeyStrategy = require('passport-localapikey-update').Strategy;
+const BasicStrategy = require('passport-http').BasicStrategy;
 
-passport.use(new LocalApiKeyStrategy({
-    apiKeyHeader: 'x-apikey'
-  },
-  function(apiKey, done) {
-    if (apiKey.trim() === config.apiKey.trim()) {
+passport.use(new BasicStrategy(
+  function(userid, password, done) {
+    console.log('checking basic auth', arguments);
+    if (userid.trim() === 'apikey' && password.trim() === config.apiKey.trim()) {
       done(null, {});
     } else {
       done(new Error("Invalid API key"));
     }
-  }
-));
+  })
+);
 
 router.post(/^\/v1\/channel\/?$/,
-  passport.authenticate('localapikey', { session: false }),
+  passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
 
   const requestBody = req.body;
@@ -38,7 +37,7 @@ router.post(/^\/v1\/channel\/?$/,
 }));
 
 router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
-  passport.authenticate('localapikey', { session: false }),
+  passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
 
   const channelName = req.params[0];
@@ -80,7 +79,7 @@ router.get(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/, createRouteHandler((req, r
 }));
 
 router.patch(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/,
-  passport.authenticate('localapikey', { session: false }),
+  passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
 
   const channelName = req.params[0];
@@ -109,7 +108,6 @@ router.get(/^\/v1\/search\/beacons\/(.*),(.*),(.*)\/?$/, createRouteHandler((req
 
   return database.searchBeacons(latitude, longitude, radius)
     .then((dbResponse) => {
-      res.set('x-total-count', dbResponse.length);
       res.json(dbResponse);
     });
 }));
@@ -124,7 +122,7 @@ router.post(/^\/v1\/search\/slugs\/?$/, createRouteHandler((req, res) => {
 }));
 
 router.get(/^\/v1\/search\/allbeacons\/?$/,
-  passport.authenticate('localapikey', { session: false }),
+  passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
 
   return database.getAllPointsInDatabase()

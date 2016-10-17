@@ -2,14 +2,13 @@
 require('isomorphic-fetch');
 const argv = require('yargs').argv;
 
-console.dir(argv);
-
 if (!argv.apikey) {
   console.error('Must specify --apikey');
   process.exit(1);
 }
 
-const API_KEY = argv.apikey;
+const AUTH_USER = 'apikey';
+const AUTH_CREDS = 'Basic ' + new Buffer(`${AUTH_USER}:${argv.apikey}`).toString("base64");
 
 const commands = {
   'search': {
@@ -99,7 +98,7 @@ function apiGet(endpoint) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'X-ApiKey': API_KEY
+      'Authorization': AUTH_CREDS
     }
   }).then((response) => {
     return response.text();
@@ -113,11 +112,11 @@ function apiCall(endpoint, payload) {
     headers: {
       'Accept': 'application/json',
       'Content-Type': 'application/json',
-      'X-ApiKey': API_KEY
+      'Authorization': AUTH_CREDS
     },
     body: JSON.stringify(payload)
   }).then((response) => {
-    return response.text();
+    console.dir(response.headers);
   }).then(console.log)
   .catch((e) => console.error(e));
 }
