@@ -2,13 +2,15 @@ const express = require('express');
 const router = express.Router();
 const bodyParser = require('body-parser');
 const passport = require('passport');
-const authconfig = require('../../config.json');
+const config = require('../../config.json');
 const createRouteHandler = require('../express/promisehandler');
+const acaoHandler = require('../express/accesscontrol');
 const path = require('path');
 
 const database = require('../database');
 
 router.use(bodyParser.json());
+router.use(acaoHandler(config));
 
 const LocalApiKeyStrategy = require('passport-localapikey-update').Strategy;
 
@@ -16,7 +18,7 @@ passport.use(new LocalApiKeyStrategy({
     apiKeyHeader: 'x-apikey'
   },
   function(apiKey, done) {
-    if (apiKey.trim() === authconfig.apiKey.trim()) {
+    if (apiKey.trim() === config.apiKey.trim()) {
       done(null, {});
     } else {
       done(new Error("Invalid API key"));

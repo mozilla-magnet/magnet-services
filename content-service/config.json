@@ -1,3 +1,6 @@
 {
-  "apiKey": "test"
+  "apiKey": "test",
+  "acaoList": [
+    "http://localhost:3001"
+  ]
 }
