@@ -5,6 +5,12 @@ module.exports = function createRouteHandler(handler) {
   return (req, res, next) => {
     const handlerPromise = handler(req, res);
 
+    if (!handlerPromise) {
+      console.warn('WARNING: Express route does not return a promise!');
+      next();
+      return;
+    }
+
     if ('catch' in handlerPromise) {
       handlerPromise.catch((err) => {
         next(err);

@@ -61,8 +61,57 @@ module.exports = function(knex) {
       });
   }
 
+  function updateBeacon(slug, patchData) {
+
+    const updateObject = {};
+
+    let hasPatchableProperties = false;
+
+    if (patchData.url) {
+      updateObject.canonical_url = patchData.url;
+      hasPatchableProperties = true;
+    }
+
+    if (patchData.location) {
+      if (!(patchData.location.latitude && patchData.location.longitude)) {
+        throw new HttpError(400, 'A location update must include the latitude, and longitude values', 'EINVAL');
+      }
+
+      updateObject.location = st.geography(st.makePoint(patchData.location.longitude, patchData.location.latitude));
+      hasPatchableProperties = true;
+    }
+
+    if (!hasPatchableProperties) {
+      throw new HttpError(400, 'New beacon data does not include any properties available for update', 'EINVAL');
+    }
+
+    return knex('beacon')
+      .where('id', shortId.shortIdToNum(slug))
+      .update(updateObject)
+      .returning(['channel_name', 'canonical_url', st.asGeoJSON('location')])
+      .then((response) => {
+        if (response.length < 1) {
+          throw new HttpError(404, `Could not find beacon id: ${slug}`, 'ENOTFOUND');
+        }
+
+        const beaconInfo = response[0];
+
+        const parsedGeoJson = JSON.parse(beaconInfo.location);
+        return {
+          id: slug,
+          channel: beaconInfo.channel_name,
+          url: beaconInfo.canonical_url,
+          location: {
+            latitude: parsedGeoJson.coordinates[1],
+            longitude: parsedGeoJson.coordinates[0],
+          }
+        };
+      });
+  }
+
   return {
     create: createNewBeacon,
     read: getBeaconInfo,
+    patch: updateBeacon,
   };
 };

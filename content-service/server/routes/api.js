@@ -76,8 +76,18 @@ router.get(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/, createRouteHandler((req, r
     });
 }));
 
-router.post(/^\/v1\/search\/beacons\/?$/, createRouteHandler((req, res) => {
-  res.json({});
+router.patch(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/,
+  passport.authenticate('localapikey', { session: false }),
+  createRouteHandler((req, res) => {
+
+  const channelName = req.params[0];
+  const slug = req.params[1];
+  const requestBody = req.body;
+
+  return database.beacons.patch(slug, requestBody)
+    .then((response) => {
+      res.json(response);
+    });
 }));
 
 router.get(/^\/v1\/search\/shortid\/([a-zA-Z0-9_\-~]*)\/?$/, createRouteHandler((req, res) => {

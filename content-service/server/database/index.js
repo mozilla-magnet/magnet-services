@@ -60,4 +60,6 @@ module.exports = {
   searchSlugs: search.slugs,
   getAllPointsInDatabase: search.allPoints,
   getBeaconInfo: beacons.read,
+  beacons,
+  channels,
 };
