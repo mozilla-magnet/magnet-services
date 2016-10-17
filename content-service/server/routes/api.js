@@ -4,6 +4,7 @@ const bodyParser = require('body-parser');
 const passport = require('passport');
 const authconfig = require('../../config.json');
 const createRouteHandler = require('../express/promisehandler');
+const path = require('path');
 
 const database = require('../database');
 
@@ -50,7 +51,29 @@ router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
 
 router.get(/^\/v1\/channel\/(.*)\/beacons\/?$/, createRouteHandler((req, res) => {
   const channelName = req.params[0];
-  res.json(req.params);
+  return database.getAllBeaconsForChannel(channelName)
+    .then((response) => {
+      return response.map((id) => {
+        return {
+          id,
+          href: path.join(req.originalUrl, id)
+        };
+      });
+    })
+    .then((beacons) => {
+      res.json(beacons);
+    });
+}));
+
+router.get(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/, createRouteHandler((req, res) => {
+  const channelName = req.params[0];
+  const slug = req.params[1];
+
+  return database.getBeaconInfo(slug, channelName)
+    .then((response) => {
+      response.href = req.originalUrl;
+      res.json(response);
+    });
 }));
 
 router.post(/^\/v1\/search\/beacons\/?$/, createRouteHandler((req, res) => {

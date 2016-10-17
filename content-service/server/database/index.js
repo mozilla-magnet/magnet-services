@@ -62,6 +62,55 @@ function createNewBeacon(channel, beaconData) {
     });
 }
 
+function getAllBeaconsForChannel(channelName) {
+  if (!(channelName && channelName.length)) {
+    throw new HttpError(400, 'Must specify channel name in request');
+  }
+
+  return knex('beacon')
+    .select('id')
+    .where('channel_name', channelName)
+    .then((response) => {
+      return response.map((entry) => {
+        return shortId.numToShortId(entry.id);
+      });
+    });
+}
+
+function getBeaconInfo(slug, channelName) {
+  const constraints = {
+    id: shortId.shortIdToNum(slug),
+  };
+
+  if (channelName) {
+    constraints['channel_name'] = channelName;
+  }
+
+  return knex('beacon')
+    .select('channel_name', 'id', st.asGeoJSON('location'), 'canonical_url')
+    .where(constraints)
+    .limit(1)
+    .then((response) => {
+      if (response.length > 0) {
+        return response[0];
+      }
+
+      throw new HttpError(404, `Could not find beacon: ${slug}`, 'ENOTFOUND');
+    })
+    .then((beaconInfo) => {
+      const parsedGeoJson = JSON.parse(beaconInfo.location);
+      return {
+        id: slug,
+        channel: beaconInfo.channel_name,
+        url: beaconInfo.canonical_url,
+        location: {
+          latitude: parsedGeoJson.coordinates[1],
+          longitude: parsedGeoJson.coordinates[0],
+        }
+      };
+    });
+}
+
 function searchBeacons(lat, long, radius) {
 
   // ST_MakePoint is (x,y) so reverse conventional 'lat, long' to 'long, lat'
@@ -126,7 +175,7 @@ function searchSlugs(slugs) {
 };
 
 function getCanonicalUrlForShortId(id) {
-  console.log(shortId);
+  // SG:NOTE: Replace this with getBeaconInfo(id)
   return knex('beacon')
     .select('channel_name', 'canonical_url')
     .where('id', shortId.shortIdToNum(id))
@@ -171,8 +220,10 @@ function getAllPointsInDatabase() {
 module.exports = {
   createNewBeacon,
   createNewChannel,
+  getAllBeaconsForChannel,
   searchBeacons,
   getCanonicalUrlForShortId,
   searchSlugs,
   getAllPointsInDatabase,
+  getBeaconInfo,
 };
