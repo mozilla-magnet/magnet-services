@@ -5,8 +5,6 @@ const shortId = require('../utils/shortid');
 
 const HttpError = require('../express/httperror');
 
-const PGERROR_UNIQ_VIOLATION = 23505;
-
 const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
@@ -18,26 +16,7 @@ const knex = (function createPool() {
 }());
 
 const st = require('knex-postgis')(knex);
-
-function createNewChannel(channelInfo) {
-  console.log(channelInfo);
-  return knex('channel')
-    .insert({
-      name: channelInfo.name,
-      email: channelInfo.email,
-      tags: channelInfo.tags || '',
-    })
-    .then((dbResponse) => {
-      return { created: channelInfo.name };
-    }).catch((err) => {
-      if (Number(err.code) === PGERROR_UNIQ_VIOLATION) {
-        const matches = err.detail.match(/^.*\((.*)\)=\((.*)\).*$/);
-        throw new HttpError(409, `Could not create channel, ${matches[1]} must be unique`, 'EINVAL');
-      }
-
-      throw err;
-    });
-}
+const channels = require('./channels')(knex);
 
 function createNewBeacon(channel, beaconData) {
   console.log('creating new beacon');
@@ -219,7 +198,7 @@ function getAllPointsInDatabase() {
 
 module.exports = {
   createNewBeacon,
-  createNewChannel,
+  createNewChannel: channels.create,
   getAllBeaconsForChannel,
   searchBeacons,
   getCanonicalUrlForShortId,
