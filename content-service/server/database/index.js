@@ -26,11 +26,22 @@ function getAllBeaconsForChannel(channelName) {
   }
 
   return knex('beacon')
-    .select('id')
+    .select(
+      'id', 'channel_name', 'canonical_url',
+      'call_to_action', 'extra_metadata',
+      st.asGeoJSON('location'), 'is_virtual')
     .where('channel_name', channelName)
     .then((response) => {
       return response.map((entry) => {
-        return shortId.numToShortId(entry.id);
+        return {
+          id: shortId.numToShortId(entry.id),
+          channel: entry.channel_name,
+          url: entry.canonical_url,
+          call_to_action: entry.call_to_action,
+          extra_metadata: entry.extra_metadata,
+          location: JSON.parse(entry.location),
+          is_virtual: entry.is_virtual,
+        };
       });
     });
 }

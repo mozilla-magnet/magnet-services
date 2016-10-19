@@ -21,7 +21,23 @@ module.exports = function(knex) {
       });
   }
 
+  function read() {
+    return knex('channel')
+      .select('name', 'tags')
+      .limit(100)
+      .then((dbResponse) => {
+        return dbResponse.map((entry) => {
+          return {
+            id: entry.name,
+            name: entry.name,
+            tags: entry.tags,
+          };
+        });
+      });
+  }
+
   return {
     create,
+    read,
   };
 };

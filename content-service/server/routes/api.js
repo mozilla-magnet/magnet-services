@@ -16,7 +16,6 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 
 passport.use(new BasicStrategy(
   function(userid, password, done) {
-    console.log('checking basic auth', arguments);
     if (userid.trim() === 'apikey' && password.trim() === config.apiKey.trim()) {
       done(null, {});
     } else {
@@ -33,6 +32,18 @@ router.post(/^\/v1\/channel\/?$/,
   return database.createNewChannel(requestBody)
     .then((dbResponse) => {
       res.json(dbResponse);
+    });
+}));
+
+router.get(/^\/v1\/channel\/?$/,
+  passport.authenticate('basic', { session: false }),
+  createRouteHandler((req, res) => {
+
+  const requestBody = req.body;
+  return database.channels.read()
+    .then((channels) => {
+      res.set('Content-Range', `0-${channels.length}/${channels.length}`);
+      res.json(channels);
     });
 }));
 
@@ -53,17 +64,19 @@ router.post(/^\/v1\/channel\/(.*)\/beacons\/?$/,
 router.get(/^\/v1\/channel\/(.*)\/beacons\/?$/, createRouteHandler((req, res) => {
   const channelName = req.params[0];
   return database.getAllBeaconsForChannel(channelName)
-    .then((response) => {
-      return response.map((id) => {
-        return {
-          id,
-          href: path.join(req.originalUrl, id)
-        };
-      });
-    })
     .then((beacons) => {
       res.set('Content-Range', `0-${beacons.length}/${beacons.length}`);
       res.json(beacons);
+    });
+}));
+
+router.get(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/location\/?$/, createRouteHandler((req, res) => {
+  const channelName = req.params[0];
+  const slug = req.params[1];
+
+  return database.getBeaconInfo(slug, channelName)
+    .then((response) => {
+      res.json(response.location);
     });
 }));
 
