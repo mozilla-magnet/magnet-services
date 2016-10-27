@@ -36,7 +36,6 @@ router.post(/^\/v1\/channel\/?$/,
 }));
 
 router.get(/^\/v1\/channel\/?$/,
-  passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
 
   const requestBody = req.body;

@@ -27,6 +27,10 @@ This is done for you if you use `npm start`.
 
 ## API
 
+#### GET `/v1/channel`
+
+Get a list of all channels.
+
 #### POST `/v1/channel`
 
 Authenticate with an api key set in the `X-ApiKey` header.
