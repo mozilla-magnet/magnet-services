@@ -5,10 +5,14 @@ const {
 
 const request = require('supertest-as-promised');
 const app = require('../server/app');
-const apiKey = require('../config.json').api_key;
+const {
+  api_key: API_KEY,
+  short_url: SHORT_URL,
+} = require('../config.json');
 const path = require('path');
+const nodeUrl = require('url');
 
-const authHeaderBase64 = new Buffer(`apikey:${apiKey}`)
+const authHeaderBase64 = new Buffer(`apikey:${API_KEY}`)
   .toString('base64');
 const authHeader = `Basic ${authHeaderBase64}`;
 
@@ -128,6 +132,7 @@ describe('API', function() {
             .expect('Content-Type', /application\/json/)
             .expect([{
               id: shortId,
+              short_url: nodeUrl.resolve(SHORT_URL, shortId),
               channel: 'testchannel',
               location: {
                 latitude: 10,
@@ -168,6 +173,7 @@ describe('API', function() {
             .expect(200)
             .expect({
               id: shortId,
+              short_url: nodeUrl.resolve(SHORT_URL, shortId),
               channel: 'testchannel',
               location: {
                 latitude: 10,

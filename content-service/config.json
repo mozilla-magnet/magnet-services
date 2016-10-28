@@ -2,5 +2,6 @@
   "api_key": "test",
   "acao_list": [
     "http://localhost:3001"
-  ]
+  ],
+  "short_url": "http://localhost:3002"
 }
