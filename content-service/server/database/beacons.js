@@ -101,7 +101,6 @@ module.exports = function(knex) {
       })
       .filter(shortId => !!shortId);
 
-    const rawQuery = searchUrls.map(_ => '?').join(',');
     let queryBuilder = selectBeacon();
 
     if (searchIds.length) {
