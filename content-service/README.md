@@ -173,15 +173,8 @@ Post a JSON encoded array of URLs (`application/json`)
 [ "http://test.com/2", "http://test2.com/3/2/1" ]
 ```
 
-Responds with `application/json` matching requested URLs to an object, or false
-if the URL is not contained in the database.
-
-```JS
-{
-  "http://test.com/2": { ... },
-  "http://test2.com/3/2/1": false
-}
-```
+Responds with an `application/json` array for all URLs that have corresponding
+entries, if a URL is not in the database, it responds with nothing.
 
 #### GET `/v1/search/allbeacons`
 

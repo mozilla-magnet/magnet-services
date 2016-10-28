@@ -1,4 +1,4 @@
-const shortId = require('../utils/shortid');
+const { shortIdToNum, numToShortId, } = require('../utils/shortid');
 const HttpError = require('../express/httperror');
 
 module.exports = function(knex) {
@@ -17,7 +17,7 @@ module.exports = function(knex) {
         return dbResponse.map((entry) => {
           const parsedGeoJson = JSON.parse(entry.location);
           return {
-            slug: shortId.numToShortId(entry.id),
+            slug: numToShortId(entry.id),
             channel_name: entry.channel_name,
             location: {
               latitude: parsedGeoJson.coordinates[1],
@@ -29,7 +29,6 @@ module.exports = function(knex) {
   }
 
   function searchSlugs(slugs) {
-
     if (!Array.isArray(slugs)) {
       throw new HttpError(400, 'Request body must be an array', 'EINVAL');
     }
@@ -49,11 +48,11 @@ module.exports = function(knex) {
 
     return knex('beacon')
       .select('channel_name', 'id', st.asGeoJSON('location'))
-      .whereIn('id', slugs.map(shortId.shortIdToNum))
+      .whereIn('id', slugs.map(shortIdToNum))
       .then((dbResponse) => {
         dbResponse.forEach((entry) => {
           const parsedGeoJson = JSON.parse(entry.location);
-          const slug = shortId.numToShortId(entry.id);
+          const slug = numToShortId(entry.id);
           resultsToReturn[slug] = {
             channel_name: entry.channel_name,
             location: {

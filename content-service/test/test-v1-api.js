@@ -216,8 +216,8 @@ describe('API', function() {
               nodeUrl.resolve(SHORT_URL, shortId)
             ])
             .expect(200)
-            .expect({
-              [shortUrl]: {
+            .expect([
+              {
                 id: shortId,
                 short_url: shortUrl,
                 channel: 'testchannel',
@@ -230,7 +230,7 @@ describe('API', function() {
                 call_to_action: {},
                 extra_metadata: {}
               }
-            });
+            ]);
         });
       });
     });

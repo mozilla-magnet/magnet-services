@@ -9,7 +9,7 @@ const knex = (function createPool() {
   const knex = require('knex')({
     client: 'pg',
     connection: dbConfig,
-    pool: { min: 1, max: 10 }
+    pool: { min: 1, max: 10 },
   });
 
   return knex;
