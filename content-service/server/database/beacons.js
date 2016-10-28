@@ -1,5 +1,7 @@
 const shortId = require('../utils/shortid');
 const HttpError = require('../express/httperror');
+const SHORT_URL = require('../../config.json').short_url;
+const resolveUrl = require('url').resolve;
 
 module.exports = function(knex) {
   const st = require('knex-postgis')(knex);
@@ -27,6 +29,41 @@ module.exports = function(knex) {
       });
   }
 
+  function mapDatabaseResponseToApiResponse(beacon) {
+    const location = JSON.parse(beacon.location);
+    const short = shortId.numToShortId(beacon.id);
+    return {
+      id: short,
+      short_url: resolveUrl(SHORT_URL, short),
+      channel: beacon.channel_name,
+      url: beacon.canonical_url,
+      call_to_action: JSON.parse(beacon.call_to_action),
+      extra_metadata: JSON.parse(beacon.extra_metadata),
+      location:  {
+        latitude: location.coordinates[1],
+        longitude: location.coordinates[0],
+      },
+      is_virtual: beacon.is_virtual,
+    };
+  }
+
+
+  function batchGetBeaconInfo(channelName) {
+    if (!(channelName && channelName.length)) {
+      throw new HttpError(400, 'Must specify channel name in request');
+    }
+
+    return knex('beacon')
+      .select(
+        'id', 'channel_name', 'canonical_url',
+        'call_to_action', 'extra_metadata',
+        st.asGeoJSON('location'), 'is_virtual')
+      .where('channel_name', channelName)
+      .then((response) => {
+        return response.map(mapDatabaseResponseToApiResponse);
+      });
+  }
+
   function getBeaconInfo(slug, channelName) {
     const constraints = {
       id: shortId.shortIdToNum(slug),
@@ -50,21 +87,7 @@ module.exports = function(knex) {
 
         throw new HttpError(404, `Could not find beacon: ${slug}`, 'ENOTFOUND');
       })
-      .then((entry) => {
-        const location = JSON.parse(entry.location);
-        return {
-          id: shortId.numToShortId(entry.id),
-          channel: entry.channel_name,
-          url: entry.canonical_url,
-          call_to_action: JSON.parse(entry.call_to_action),
-          extra_metadata: JSON.parse(entry.extra_metadata),
-          location:  {
-            latitude: location.coordinates[1],
-            longitude: location.coordinates[0],
-          },
-          is_virtual: entry.is_virtual,
-        };
-      });
+      .then(mapDatabaseResponseToApiResponse);
   }
 
   function updateBeacon(slug, patchData) {
@@ -122,6 +145,7 @@ module.exports = function(knex) {
   return {
     create: createNewBeacon,
     read: getBeaconInfo,
+    batchGet: batchGetBeaconInfo,
     patch: updateBeacon,
     truncate: truncateTable,
   };
