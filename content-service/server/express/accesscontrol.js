@@ -1,6 +1,6 @@
 const cors = require('cors');
 module.exports = function acao(config) {
-  const acaoHosts = new Set(config.acaoList);
+  const acaoHosts = new Set(config.acao_list);
   const corsOptions = {
     origin: function(origin, callback) {
       const originAllowed = acaoHosts.has(origin) || origin === undefined;

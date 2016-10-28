@@ -5,7 +5,7 @@ const {
 
 const request = require('supertest-as-promised');
 const app = require('../server/app');
-const apiKey = require('../config.json').apiKey;
+const apiKey = require('../config.json').api_key;
 const path = require('path');
 
 const authHeaderBase64 = new Buffer(`apikey:${apiKey}`)

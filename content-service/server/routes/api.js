@@ -16,7 +16,7 @@ const BasicStrategy = require('passport-http').BasicStrategy;
 
 passport.use(new BasicStrategy(
   function(userid, password, done) {
-    if (userid.trim() === 'apikey' && password.trim() === config.apiKey.trim()) {
+    if (userid.trim() === 'apikey' && password.trim() === config.api_key.trim()) {
       done(null, {});
     } else {
       done(new Error("Invalid API key"));
