@@ -85,7 +85,6 @@ router.get(/^\/v1\/channel\/(.*)\/beacons\/(.*)\/?$/, createRouteHandler((req, r
 
   return database.getBeaconInfo(slug, channelName)
     .then((response) => {
-      response.href = req.originalUrl;
       res.json(response);
     });
 }));

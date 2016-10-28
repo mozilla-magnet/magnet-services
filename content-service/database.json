@@ -3,7 +3,7 @@
     "driver": "pg",
     "user": "postgres",
     "password": "postgres",
-    "host": "db",
+    "host": "localhost",
     "database": "content-service"
   },
   "local": {

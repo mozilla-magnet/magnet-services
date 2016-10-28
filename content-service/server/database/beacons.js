@@ -37,7 +37,10 @@ module.exports = function(knex) {
     }
 
     return knex('beacon')
-      .select('channel_name', 'id', st.asGeoJSON('location'), 'canonical_url')
+      .select(
+        'id', 'channel_name', 'canonical_url',
+        'call_to_action', 'extra_metadata',
+        st.asGeoJSON('location'), 'is_virtual')
       .where(constraints)
       .limit(1)
       .then((response) => {
@@ -47,16 +50,19 @@ module.exports = function(knex) {
 
         throw new HttpError(404, `Could not find beacon: ${slug}`, 'ENOTFOUND');
       })
-      .then((beaconInfo) => {
-        const parsedGeoJson = JSON.parse(beaconInfo.location);
+      .then((entry) => {
+        const location = JSON.parse(entry.location);
         return {
-          id: slug,
-          channel: beaconInfo.channel_name,
-          url: beaconInfo.canonical_url,
-          location: {
-            latitude: parsedGeoJson.coordinates[1],
-            longitude: parsedGeoJson.coordinates[0],
-          }
+          id: shortId.numToShortId(entry.id),
+          channel: entry.channel_name,
+          url: entry.canonical_url,
+          call_to_action: JSON.parse(entry.call_to_action),
+          extra_metadata: JSON.parse(entry.extra_metadata),
+          location:  {
+            latitude: location.coordinates[1],
+            longitude: location.coordinates[0],
+          },
+          is_virtual: entry.is_virtual,
         };
       });
   }
@@ -109,9 +115,14 @@ module.exports = function(knex) {
       });
   }
 
+  function truncateTable() {
+    return knex('beacon').delete();
+  }
+
   return {
     create: createNewBeacon,
     read: getBeaconInfo,
     patch: updateBeacon,
+    truncate: truncateTable,
   };
 };

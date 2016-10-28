@@ -2,5 +2,6 @@
   "apiKey": "test",
   "acaoList": [
     "http://localhost:3001"
-  ]
+  ],
+  "shortenerHost": "http://localhost:3001"
 }

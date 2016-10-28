@@ -36,8 +36,18 @@ module.exports = function(knex) {
       });
   }
 
+  function truncateTable() {
+    return knex('channel').delete();
+  }
+
+  function deleteChannel(channelName) {
+    return knex('channel').where('name', channelName).delete();
+  }
+
   return {
     create,
     read,
+    deleteChannel,
+    truncate: truncateTable,
   };
 };
