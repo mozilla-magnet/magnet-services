@@ -27,13 +27,19 @@ This is done for you if you use `npm start`.
 
 ## API
 
+### Authentication
+
+Authentication is with Basic Auth.  The default username is 'apikey' and the
+password is defined as `api_key` in the `config.json` file. This is subject to
+change. Not all end points require auth.
+
 #### GET `/v1/channel`
 
 Get a list of all channels.
 
 #### POST `/v1/channel`
 
-Authenticate with an api key set in the `X-ApiKey` header.
+Must be authenticated.
 
 Creates a new `channel`.
 
@@ -49,7 +55,7 @@ Body must be content type `application/json` and contain the following fields:
 
 #### POST `/v1/channel/:name/beacons`
 
-Authenticate with an api key set in the `X-ApiKey` header.
+Must be authenticated.
 
 Creates a new `beacon` resource.
 
@@ -157,9 +163,29 @@ Example:
 }
 ```
 
+#### GET `/v1/search/url`
+
+Must be authenticated.
+
+Post a JSON encoded array of URLs (`application/json`)
+
+```JS
+[ "http://test.com/2", "http://test2.com/3/2/1" ]
+```
+
+Responds with `application/json` matching requested URLs to an object, or false
+if the URL is not contained in the database.
+
+```JS
+{
+  "http://test.com/2": { ... },
+  "http://test2.com/3/2/1": false
+}
+```
+
 #### GET `/v1/search/allbeacons`
 
-Must be authenticated with an API key in the header `X-ApiKey`.
+Must be authenticated.
 
 Returns a GeoJSON format `FeatureCollection` object containing all points in
 the database.
@@ -168,3 +194,4 @@ Responds with `application/json`.
 
 A good way to visualise this is to create a GitHub Gist with the `geojson` file
 extension, it will then be rendered for you.
+

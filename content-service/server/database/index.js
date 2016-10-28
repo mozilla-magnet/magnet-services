@@ -41,6 +41,7 @@ module.exports = {
   createNewChannel: channels.create,
   getAllBeaconsForChannel: beacons.getAllForChannel,
   searchBeacons: search.beaconsByLocation,
+  searchUrls: beacons.getByUrls,
   getCanonicalUrlForShortId,
   searchSlugs: search.slugs,
   getAllPointsInDatabase: search.allPoints,
