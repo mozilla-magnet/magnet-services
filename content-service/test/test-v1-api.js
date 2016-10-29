@@ -193,6 +193,49 @@ describe('API', function() {
     describe('PATCH', function() {});
   });
 
+  describe('/search/url', function() {
+    describe('POST', function() {
+      it('should get the beacon information for all posted URLs', () => {
+        return database.beacons.create('testchannel', {
+          location: {
+            lat: 10,
+            long: 11,
+          },
+          is_virtual: true,
+          content_attachment: {
+            url: 'https://example.com/coolsite',
+            calls_to_action: {}
+          },
+          additional_metadata: {}
+        }).then(({ shortId, }) => {
+          const shortUrl = nodeUrl.resolve(SHORT_URL, shortId)
+          return request(app)
+            .post('/v1/search/url')
+            .set('Authorization', authHeader)
+            .send([
+              nodeUrl.resolve(SHORT_URL, shortId)
+            ])
+            .expect(200)
+            .expect([
+              {
+                id: shortId,
+                short_url: shortUrl,
+                channel: 'testchannel',
+                location: {
+                  latitude: 10,
+                  longitude: 11,
+                },
+                is_virtual: true,
+                url: 'https://example.com/coolsite',
+                call_to_action: {},
+                extra_metadata: {}
+              }
+            ]);
+        });
+      });
+    });
+  });
+
   after(() => {
     return stopServices();
   });

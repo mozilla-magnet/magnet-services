@@ -1,10 +1,22 @@
-const shortId = require('../utils/shortid');
+const { shortIdToNum, numToShortId, } = require('../utils/shortid');
 const HttpError = require('../express/httperror');
 const SHORT_URL = require('../../config.json').short_url;
-const resolveUrl = require('url').resolve;
+const nodeUrl = require('url');
+const resolveUrl = nodeUrl.resolve;
+const nodePath = require('path');
+
+const PARSED_SHORT_URL = Object.freeze(nodeUrl.parse(SHORT_URL));
 
 module.exports = function(knex) {
   const st = require('knex-postgis')(knex);
+
+  function selectBeacon() {
+    return knex('beacon')
+      .select(
+        'id', 'channel_name', 'canonical_url',
+        'call_to_action', 'extra_metadata',
+        st.asGeoJSON('location'), 'is_virtual');
+  }
 
   function createNewBeacon(channel, beaconData) {
     console.log('creating new beacon');
@@ -25,13 +37,13 @@ module.exports = function(knex) {
         location: st.geography(st.makePoint(beaconData.location.long, beaconData.location.lat)),
         is_virtual: beaconData.is_virtual
       }, 'id').then((dbResponse) => {
-        return { id: dbResponse[0], shortId: shortId.numToShortId(dbResponse[0]) };
+        return { id: dbResponse[0], shortId: numToShortId(dbResponse[0]) };
       });
   }
 
   function mapDatabaseResponseToApiResponse(beacon) {
     const location = JSON.parse(beacon.location);
-    const short = shortId.numToShortId(beacon.id);
+    const short = numToShortId(beacon.id);
     return {
       id: short,
       short_url: resolveUrl(SHORT_URL, short),
@@ -47,17 +59,82 @@ module.exports = function(knex) {
     };
   }
 
+  function shortUrlToId(url) {
+    const parsedUrl = nodeUrl.parse(url);
+    const isShortUrl =
+      parsedUrl.host === PARSED_SHORT_URL.host &&
+      parsedUrl.protocol === PARSED_SHORT_URL.protocol;
+
+    if (!isShortUrl) {
+      return false;
+    }
+
+    return nodePath.basename(parsedUrl.pathname);
+  }
+
+  function searchUrls(urls) {
+    if (!Array.isArray(urls)) {
+      throw new HttpError(400, 'Request body must be an array', 'EINVAL');
+    }
+
+    if (urls.length > 100) {
+      throw new HttpError(400, 'Request body too large (limit of 100 items)', 'E2BIG');
+    }
+
+    if (urls.length === 0) {
+      return Promise.resolve({});
+    }
+
+    // Split the search into two, search for short IDs if the URLs is a short
+    // URL, and search for 'general' URLs if the URL is not a Magnet short URL.
+    const searchUrls = [];
+
+    const searchIds = urls
+      .map((url) => {
+        const shortId = shortUrlToId(url);
+        // Not a magnet short URL, so add to the general search for urls
+        if (!shortId) {
+          searchUrls.push(url);
+        }
+
+        return shortId;
+      })
+      .filter(shortId => !!shortId);
+
+    let queryBuilder = selectBeacon();
+
+    if (searchIds.length) {
+      queryBuilder = queryBuilder.whereIn('id', searchIds);
+    }
+
+    // Note that due to ambiguity within knex, arrays must be passed as arguments within a
+    // containing array when creating prepared statements.
+    return queryBuilder
+     .orWhereRaw('canonical_url = ANY(?::text[])', [searchUrls])
+     .then((response) => {
+       return response.map(mapDatabaseResponseToApiResponse);
+     });
+  }
+
   function getAllForChannel(channelName) {
     if (!(channelName && channelName.length)) {
       throw new HttpError(400, 'Must specify channel name in request');
     }
 
-    return knex('beacon')
-      .select(
-        'id', 'channel_name', 'canonical_url',
-        'call_to_action', 'extra_metadata',
-        st.asGeoJSON('location'), 'is_virtual')
+    return selectBeacon()
       .where('channel_name', channelName)
+      .then((response) => {
+        return response.map(mapDatabaseResponseToApiResponse);
+      });
+  }
+
+  function batchGetBeaconInfoForShortIds(shortIds) {
+    const ids = shortIds
+      .filter(shortId => !!shortId)
+      .map(shortIdToNum);
+
+    return selectBeacon()
+      .whereIn('id', ids)
       .then((response) => {
         return response.map(mapDatabaseResponseToApiResponse);
       });
@@ -65,18 +142,14 @@ module.exports = function(knex) {
 
   function getBeaconInfo(slug, channelName) {
     const constraints = {
-      id: shortId.shortIdToNum(slug),
+      id: shortIdToNum(slug),
     };
 
     if (channelName) {
       constraints['channel_name'] = channelName;
     }
 
-    return knex('beacon')
-      .select(
-        'id', 'channel_name', 'canonical_url',
-        'call_to_action', 'extra_metadata',
-        st.asGeoJSON('location'), 'is_virtual')
+    return selectBeacon()
       .where(constraints)
       .limit(1)
       .then((response) => {
@@ -113,8 +186,8 @@ module.exports = function(knex) {
       throw new HttpError(400, 'New beacon data does not include any properties available for update', 'EINVAL');
     }
 
-    return knex('beacon')
-      .where('id', shortId.shortIdToNum(slug))
+    return selectBeacon()
+      .where('id', shortIdToNum(slug))
       .update(updateObject)
       .returning(['channel_name', 'canonical_url', st.asGeoJSON('location')])
       .then((response) => {
@@ -147,5 +220,6 @@ module.exports = function(knex) {
     getAllForChannel,
     patch: updateBeacon,
     truncate: truncateTable,
+    getByUrls: searchUrls,
   };
 };

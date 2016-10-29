@@ -132,6 +132,18 @@ router.post(/^\/v1\/search\/slugs\/?$/, createRouteHandler((req, res) => {
     });
 }));
 
+router.post(/^\/v1\/search\/url\/?$/,
+  passport.authenticate('basic', { session: false }),
+  createRouteHandler((req, res) => {
+
+  const requestBody = req.body;
+
+  return database.searchUrls(requestBody)
+    .then((response) => {
+      res.json(response)
+    });
+}));
+
 router.get(/^\/v1\/search\/allbeacons\/?$/,
   passport.authenticate('basic', { session: false }),
   createRouteHandler((req, res) => {
