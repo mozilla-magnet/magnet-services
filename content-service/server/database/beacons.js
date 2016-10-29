@@ -99,7 +99,8 @@ module.exports = function(knex) {
 
         return shortId;
       })
-      .filter(shortId => !!shortId);
+      .filter(shortId => !!shortId)
+      .map(shortIdToNum);
 
     let queryBuilder = selectBeacon();
 
