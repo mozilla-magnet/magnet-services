@@ -61,7 +61,6 @@ Body must be content type `application/json` and contain the following fields
   location: { lat: <number>, long: <number> }, // Optional unless is_virtual is
   true
   is_virtual: <boolean>,
-  short_id: <string>, // Optional: Will assign this as the shortened ID for this beacon, if omitted, a new one will be generated.
   content_attachment: {
     url: <string>,
     calls_to_action: {
@@ -84,6 +83,22 @@ TODO: Pagination
 #### GET `/v1/channel/:name/beacons/:slug`
 
 Get information about a beacon.
+
+```JS
+{
+  id: <string>,
+  short_url: <string>,
+  channel: <string>,
+  url: <string>,
+  call_to_action: <object>,
+  extra_metadata: <object>,
+  location:  {
+    latitude: <number>,
+    longitude: <number>
+  },
+  is_virtual: <boolean>
+}
+```
 
 #### PATCH `/v1/channel/:name/beacons/:slug`
 

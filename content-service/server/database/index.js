@@ -20,36 +20,6 @@ const channels = require('./channels')(knex);
 const beacons = require('./beacons')(knex);
 const search = require('./search')(knex);
 
-function getAllBeaconsForChannel(channelName) {
-  if (!(channelName && channelName.length)) {
-    throw new HttpError(400, 'Must specify channel name in request');
-  }
-
-  return knex('beacon')
-    .select(
-      'id', 'channel_name', 'canonical_url',
-      'call_to_action', 'extra_metadata',
-      st.asGeoJSON('location'), 'is_virtual')
-    .where('channel_name', channelName)
-    .then((response) => {
-      return response.map((entry) => {
-      const location = JSON.parse(entry.location);
-        return {
-          id: shortId.numToShortId(entry.id),
-          channel: entry.channel_name,
-          url: entry.canonical_url,
-          call_to_action: JSON.parse(entry.call_to_action),
-          extra_metadata: JSON.parse(entry.extra_metadata),
-          location:  {
-            latitude: location.coordinates[1],
-            longitude: location.coordinates[0],
-          },
-          is_virtual: entry.is_virtual,
-        };
-      });
-    });
-}
-
 function getCanonicalUrlForShortId(id) {
   // SG:NOTE: Replace this with getBeaconInfo(id)
   return knex('beacon')
@@ -69,7 +39,7 @@ function getCanonicalUrlForShortId(id) {
 module.exports = {
   createNewBeacon: beacons.create,
   createNewChannel: channels.create,
-  getAllBeaconsForChannel,
+  getAllBeaconsForChannel: beacons.getAllForChannel,
   searchBeacons: search.beaconsByLocation,
   getCanonicalUrlForShortId,
   searchSlugs: search.slugs,
