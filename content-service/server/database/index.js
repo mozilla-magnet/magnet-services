@@ -39,7 +39,7 @@ function getCanonicalUrlForShortId(id) {
 module.exports = {
   createNewBeacon: beacons.create,
   createNewChannel: channels.create,
-  getAllBeaconsForChannel: beacons.batchGet,
+  getAllBeaconsForChannel: beacons.getAllForChannel,
   searchBeacons: search.beaconsByLocation,
   getCanonicalUrlForShortId,
   searchSlugs: search.slugs,

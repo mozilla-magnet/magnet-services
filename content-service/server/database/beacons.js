@@ -47,8 +47,7 @@ module.exports = function(knex) {
     };
   }
 
-
-  function batchGetBeaconInfo(channelName) {
+  function getAllForChannel(channelName) {
     if (!(channelName && channelName.length)) {
       throw new HttpError(400, 'Must specify channel name in request');
     }
@@ -145,7 +144,7 @@ module.exports = function(knex) {
   return {
     create: createNewBeacon,
     read: getBeaconInfo,
-    batchGet: batchGetBeaconInfo,
+    getAllForChannel,
     patch: updateBeacon,
     truncate: truncateTable,
   };
