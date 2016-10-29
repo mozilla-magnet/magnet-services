@@ -30,7 +30,8 @@
     "passport": "^0.3.2",
     "passport-http": "^0.3.0",
     "supertest-as-promised": "^4.0.1",
-    "yargs": "^6.0.0"
+    "yargs": "^6.0.0",
+    "areyoubeingserved": "samgiles/areyoubeingserved"
   },
   "devDependencies": {
     "mocha": "^3.1.0",
