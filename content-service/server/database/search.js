@@ -1,8 +1,8 @@
 const { shortIdToNum, numToShortId, } = require('../utils/shortid');
 const HttpError = require('../express/httperror');
-const utils = require('./utils');
 
 module.exports = function(knex) {
+  const utils = require('./utils')(knex);
   const st = require('knex-postgis')(knex);
 
   function searchBeacons(lat, long, radius) {
@@ -10,7 +10,7 @@ module.exports = function(knex) {
     // ST_MakePoint is (x,y) so reverse conventional 'lat, long' to 'long, lat'
     const point = st.makePoint(long, lat);
 
-    return utils.selectBeacons(knex)
+    return utils.selectBeacons()
       .where(st.dwithin('location', point, radius))
       .limit(100)
       .then((dbResponse) => {

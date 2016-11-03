@@ -1,9 +1,9 @@
 const { shortIdToNum, numToShortId, } = require('../utils/shortid');
 const HttpError = require('../express/httperror');
-const utils = require('./utils');
 
 module.exports = function(knex) {
   const st = require('knex-postgis')(knex);
+  const utils = require('./utils')(knex);
 
   function createNewBeacon(channel, beaconData) {
     console.log('creating new beacon');
@@ -58,7 +58,7 @@ module.exports = function(knex) {
       .filter(shortId => !!shortId)
       .map(shortIdToNum);
 
-    let queryBuilder = utils.selectBeacons(knex);
+    let queryBuilder = utils.selectBeacons();
 
     if (searchIds.length) {
       queryBuilder = queryBuilder.whereIn('id', searchIds);
@@ -78,7 +78,7 @@ module.exports = function(knex) {
       throw new HttpError(400, 'Must specify channel name in request');
     }
 
-    return utils.selectBeacons(knex)
+    return utils.selectBeacons()
       .where('channel_name', channelName)
       .then((response) => {
         return response.map(utils.mapDatabaseResponseToApiResponse);
@@ -90,7 +90,7 @@ module.exports = function(knex) {
       .filter(shortId => !!shortId)
       .map(shortIdToNum);
 
-    return utils.selectBeacons(knex)
+    return utils.selectBeacons()
       .whereIn('id', ids)
       .then((response) => {
         return response.map(utils.mapDatabaseResponseToApiResponse);
@@ -106,7 +106,7 @@ module.exports = function(knex) {
       constraints['channel_name'] = channelName;
     }
 
-    return utils.selectBeacons(knex)
+    return utils.selectBeacons()
       .where(constraints)
       .limit(1)
       .then((response) => {
