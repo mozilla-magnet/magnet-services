@@ -2,9 +2,19 @@ const nodeUrl = require('url');
 const resolveUrl = nodeUrl.resolve;
 const nodePath = require('path');
 const { shortIdToNum, numToShortId, } = require('../utils/shortid');
+const SHORT_URLS = require('../../config.json').short_url;
+const SHORT_URL = SHORT_URLS[0];
 
-const SHORT_URL = require('../../config.json').short_url;
-const SHORT_URL_KEY = asDomainAndProtocolKey(require('../../config.json').short_url);
+if (!SHORT_URL) {
+  throw new Error('You must specify at least one short_url in the configuration file');
+}
+
+// Build a set of short URLs from the config, we can then test incoming
+// requests based on membership in the set
+const shortUrls = SHORT_URLS.reduce((set, shortUrl) => {
+  set.add(asDomainAndProtocolKey(shortUrl));
+  return set;
+}, new Set());
 
 // Take a URL and reduce it to a key based on the protocol and
 // hostname - inclusive of port number
@@ -15,8 +25,7 @@ function asDomainAndProtocolKey(url) {
 
 function shortUrlToId(url) {
   const parsedUrl = nodeUrl.parse(url);
-  const isShortUrl =
-    asDomainAndProtocolKey(url) === SHORT_URL_KEY;
+  const isShortUrl = shortUrls.has(asDomainAndProtocolKey(url));
 
   if (!isShortUrl) {
     return false;

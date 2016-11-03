@@ -3,5 +3,8 @@
   "acao_list": [
     "http://localhost:3001"
   ],
-  "short_url": "http://localhost:3002"
+  "short_url": [
+    "https://pm0.io",
+    "http://localhost:3002"
+  ]
 }
