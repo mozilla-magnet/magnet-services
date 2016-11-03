@@ -2,6 +2,7 @@ const { shortIdToNum, numToShortId, } = require('../utils/shortid');
 const HttpError = require('../express/httperror');
 
 module.exports = function(knex) {
+  const utils = require('./utils')(knex);
   const st = require('knex-postgis')(knex);
 
   function searchBeacons(lat, long, radius) {
@@ -9,22 +10,19 @@ module.exports = function(knex) {
     // ST_MakePoint is (x,y) so reverse conventional 'lat, long' to 'long, lat'
     const point = st.makePoint(long, lat);
 
-    return knex('beacon')
-      .select('channel_name', 'id', st.asGeoJSON('location'))
+    return utils.selectBeacons()
       .where(st.dwithin('location', point, radius))
       .limit(100)
       .then((dbResponse) => {
-        return dbResponse.map((entry) => {
-          const parsedGeoJson = JSON.parse(entry.location);
-          return {
-            slug: numToShortId(entry.id),
-            channel_name: entry.channel_name,
-            location: {
-              latitude: parsedGeoJson.coordinates[1],
-              longitude: parsedGeoJson.coordinates[0],
-            }
-          };
-        });
+        return dbResponse
+          .map(utils.mapDatabaseResponseToApiResponse)
+          // For backwards compatibility duplicate some fields with their old
+          // names
+          .map((beacon) => {
+            beacon.slug = beacon.id;
+            beacon.channel_name = beacon.channel;
+            return beacon;
+          });
       });
   }
 
