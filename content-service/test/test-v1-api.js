@@ -7,8 +7,11 @@ const request = require('supertest-as-promised');
 const app = require('../server/app');
 const {
   api_key: API_KEY,
-  short_url: SHORT_URL,
+  short_url,
 } = require('../config.json');
+
+// Uses the first in the config as the SHORT_URL
+const SHORT_URL = short_url[0];
 const path = require('path');
 const nodeUrl = require('url');
 
