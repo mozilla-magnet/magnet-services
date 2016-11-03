@@ -137,6 +137,7 @@ describe('API', function() {
               id: shortId,
               short_url: nodeUrl.resolve(SHORT_URL, shortId),
               channel: 'testchannel',
+              channel_id: 'testchannel',
               location: {
                 latitude: 10,
                 longitude: 11,
@@ -178,6 +179,7 @@ describe('API', function() {
               id: shortId,
               short_url: nodeUrl.resolve(SHORT_URL, shortId),
               channel: 'testchannel',
+              channel_id: 'testchannel',
               location: {
                 latitude: 10,
                 longitude: 11,
@@ -224,6 +226,7 @@ describe('API', function() {
                 id: shortId,
                 short_url: shortUrl,
                 channel: 'testchannel',
+                channel_id: 'testchannel',
                 location: {
                   latitude: 10,
                   longitude: 11,

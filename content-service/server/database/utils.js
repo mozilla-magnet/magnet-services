@@ -40,7 +40,9 @@ function mapDatabaseResponseToApiResponse(beacon) {
   return {
     id: short,
     short_url: resolveUrl(SHORT_URL, short),
+    // Use both for backwards compat
     channel: beacon.channel_name,
+    channel_id: beacon.channel_name,
     url: beacon.canonical_url,
     call_to_action: JSON.parse(beacon.call_to_action),
     extra_metadata: JSON.parse(beacon.extra_metadata),
