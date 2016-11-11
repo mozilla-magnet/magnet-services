@@ -132,9 +132,7 @@ router.post(/^\/v1\/search\/slugs\/?$/, createRouteHandler((req, res) => {
     });
 }));
 
-router.post(/^\/v1\/search\/url\/?$/,
-  passport.authenticate('basic', { session: false }),
-  createRouteHandler((req, res) => {
+router.post(/^\/v1\/search\/url\/?$/, createRouteHandler((req, res) => {
 
   const requestBody = req.body;
 
