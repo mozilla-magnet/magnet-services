@@ -41,7 +41,7 @@ function mapDatabaseResponseToApiResponse(beacon) {
     id: short,
     short_url: resolveUrl(SHORT_URL, short),
     // Use both for backwards compat
-    channel: beacon.channel_id,
+    channel: beacon.channel_name,
     channel_id: beacon.channel_id,
     url: beacon.canonical_url,
     call_to_action: JSON.parse(beacon.call_to_action),
@@ -60,7 +60,7 @@ module.exports = function(knex) {
   function selectBeacons() {
     return knex('beacon')
       .select(
-        'beacon.id as beacon_id', 'channel_id', 'canonical_url',
+        'beacon.id as beacon_id', 'channel_id', 'channel.name as channel_name', 'canonical_url',
         'call_to_action', 'extra_metadata',
         st.asGeoJSON('location'), 'is_virtual')
       .join('channel', function() {
