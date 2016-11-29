@@ -27,9 +27,9 @@ module.exports = function(err, req, res, next) {
   if (isDevEnv) {
     msg += '\n\n===========================================================\n';
     msg += 'Stack (shown because ENV=dev):\n\n' + (err.stack || 'no stacktrace available ');
+    console.error(msg);
   }
 
   res.writeHead(statusCode, headers);
-  console.log(msg);
   res.end(msg);
 };
