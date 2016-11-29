@@ -36,13 +36,13 @@ function shortUrlToId(url) {
 
 function mapDatabaseResponseToApiResponse(beacon) {
   const location = JSON.parse(beacon.location);
-  const short = numToShortId(beacon.id);
+  const short = numToShortId(beacon.beacon_id);
   return {
     id: short,
     short_url: resolveUrl(SHORT_URL, short),
     // Use both for backwards compat
-    channel: beacon.channel_name,
-    channel_id: beacon.channel_name,
+    channel: beacon.channel_id,
+    channel_id: beacon.channel_id,
     url: beacon.canonical_url,
     call_to_action: JSON.parse(beacon.call_to_action),
     extra_metadata: JSON.parse(beacon.extra_metadata),
@@ -60,9 +60,12 @@ module.exports = function(knex) {
   function selectBeacons() {
     return knex('beacon')
       .select(
-        'id', 'channel_name', 'canonical_url',
+        'beacon.id as beacon_id', 'channel_id', 'canonical_url',
         'call_to_action', 'extra_metadata',
-        st.asGeoJSON('location'), 'is_virtual');
+        st.asGeoJSON('location'), 'is_virtual')
+      .join('channel', function() {
+        this.on('channel.id', '=', 'beacon.channel_id');
+      });
   }
 
   return {

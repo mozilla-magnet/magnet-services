@@ -30,5 +30,6 @@ module.exports = function(err, req, res, next) {
   }
 
   res.writeHead(statusCode, headers);
+  console.log(msg);
   res.end(msg);
 };

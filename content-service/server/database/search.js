@@ -45,14 +45,14 @@ module.exports = function(knex) {
     }, {});
 
     return knex('beacon')
-      .select('channel_name', 'id', st.asGeoJSON('location'))
+      .select('channel_id', 'id', st.asGeoJSON('location'))
       .whereIn('id', slugs.map(shortIdToNum))
       .then((dbResponse) => {
         dbResponse.forEach((entry) => {
           const parsedGeoJson = JSON.parse(entry.location);
           const slug = numToShortId(entry.id);
           resultsToReturn[slug] = {
-            channel_name: entry.channel_name,
+            channel_name: entry.channel_id,
             location: {
               latitude: parsedGeoJson.coordinates[1],
               longitude: parsedGeoJson.coordinates[0],
@@ -70,7 +70,7 @@ module.exports = function(knex) {
    */
   function getAllPointsInDatabase() {
     return knex('beacon')
-      .select('canonical_url', 'channel_name', st.asGeoJSON('location'))
+      .select('canonical_url', 'channel_id', st.asGeoJSON('location'))
       .then((response) => {
         return response.map((entry) => {
           return {

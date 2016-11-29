@@ -30,16 +30,17 @@ const commands = {
   },
   'create': {
     'channel': function(args) {
-      if (!args[0] || !args[1]) {
-        console.error('Required args: <name> <email> <optional:tags>');
+      if (!args[0] || !args[1] || !args[2]) {
+        console.error('Required args: <id> <name> <email> <optional:tags>');
         process.exit(1);
         return;
       }
 
       const payload = {
-        name: args[0],
-        email: args[1],
-        tags: args[2] || ''
+        id: args[0]
+        name: args[1],
+        email: args[2],
+        tags: args[3] || ''
       };
 
       apiCall('https://tengam.org/content/v1/channel', payload);
@@ -47,13 +48,13 @@ const commands = {
     'beacon': function(args) {
       console.log(args);
       if (!args[0] || !args[1] || !args[2] || !args[3]) {
-        console.error('Required args: <channelname> <latitude> <longitude> <url>');
+        console.error('Required args: <channelid> <latitude> <longitude> <url>');
         console.error('Replace the negative symbol with an underscore for lat lon');
         process.exit(1);
         return;
       }
 
-      const channelName = args[0];
+      const channelId = args[0];
       const payload = {
         location: {
           lat: Number(String(args[1]).replace('_', '-')),
@@ -67,7 +68,7 @@ const commands = {
         }
       };
 
-      apiCall(`https://tengam.org/content/v1/channel/${channelName}/beacons`, payload);
+      apiCall(`https://tengam.org/content/v1/channel/${channelId}/beacons`, payload);
     }
   }
 };
