@@ -11,7 +11,7 @@ ALTER TABLE channel ADD PRIMARY KEY (id);
 /* Add back the fkey constraint */
 ALTER TABLE beacon RENAME COLUMN channel_name TO channel_id;
 ALTER TABLE beacon
-  ADD CONSTRAINT beacon_channel_name_fkey
+  ADD CONSTRAINT beacon_channel_id_fkey
 	FOREIGN KEY (channel_id)
 	REFERENCES channel(id)
 	ON DELETE CASCADE;
