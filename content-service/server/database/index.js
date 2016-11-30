@@ -23,7 +23,7 @@ const search = require('./search')(knex);
 function getCanonicalUrlForShortId(id) {
   // SG:NOTE: Replace this with getBeaconInfo(id)
   return knex('beacon')
-    .select('channel_name', 'canonical_url')
+    .select('channel_name', 'channel_id', 'canonical_url')
     .where('id', shortId.shortIdToNum(id))
     .limit(1)
     .then((response) => {

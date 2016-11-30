@@ -17,7 +17,7 @@ module.exports = function(knex) {
 
     return knex('beacon')
       .insert({
-        channel_name: channel.trim(),
+        channel_id: channel.trim(),
         canonical_url: beaconData.content_attachment.url,
         call_to_action: JSON.stringify(beaconData.content_attachment.calls_to_action || {}),
         extra_metadata: JSON.stringify(beaconData.content_attachment.additional_metadata || {}),
@@ -61,7 +61,7 @@ module.exports = function(knex) {
     let queryBuilder = utils.selectBeacons();
 
     if (searchIds.length) {
-      queryBuilder = queryBuilder.whereIn('id', searchIds);
+      queryBuilder = queryBuilder.whereIn('beacon.id', searchIds);
     }
 
     // Note that due to ambiguity within knex, arrays must be passed as arguments within a
@@ -73,13 +73,13 @@ module.exports = function(knex) {
      });
   }
 
-  function getAllForChannel(channelName) {
-    if (!(channelName && channelName.length)) {
+  function getAllForChannel(channelId) {
+    if (!(channelId && channelId.length)) {
       throw new HttpError(400, 'Must specify channel name in request');
     }
 
     return utils.selectBeacons()
-      .where('channel_name', channelName)
+      .where('channel_id', channelId)
       .then((response) => {
         return response.map(utils.mapDatabaseResponseToApiResponse);
       });
@@ -97,13 +97,15 @@ module.exports = function(knex) {
       });
   }
 
-  function getBeaconInfo(slug, channelName) {
+  function getBeaconInfo(slug, channelId) {
+    console.log("SHORT ID: ", slug);
+    console.log("CHANNEL ID: ", channelId);
     const constraints = {
-      id: shortIdToNum(slug),
+      'beacon.id': shortIdToNum(slug),
     };
 
-    if (channelName) {
-      constraints['channel_name'] = channelName;
+    if (channelId) {
+      constraints['channel_id'] = channelId;
     }
 
     return utils.selectBeacons()
@@ -146,7 +148,7 @@ module.exports = function(knex) {
     return knex('beacon')
       .where('id', shortIdToNum(slug))
       .update(updateObject)
-      .returning(['channel_name', 'canonical_url', st.asGeoJSON('location')])
+      .returning(['channel_id', 'canonical_url', st.asGeoJSON('location')])
       .then((response) => {
         if (response.length < 1) {
           throw new HttpError(404, `Could not find beacon id: ${slug}`, 'ENOTFOUND');
@@ -157,7 +159,7 @@ module.exports = function(knex) {
         const parsedGeoJson = JSON.parse(beaconInfo.location);
         return {
           id: slug,
-          channel: beaconInfo.channel_name,
+          channel: beaconInfo.channel_id,
           url: beaconInfo.canonical_url,
           location: {
             latitude: parsedGeoJson.coordinates[1],

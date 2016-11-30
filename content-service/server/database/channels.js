@@ -5,6 +5,7 @@ module.exports = function(knex) {
   function create(channelInfo) {
     return knex('channel')
       .insert({
+        id: channelInfo.id,
         name: channelInfo.name,
         email: channelInfo.email,
         tags: channelInfo.tags || '',
@@ -14,7 +15,7 @@ module.exports = function(knex) {
       }).catch((err) => {
         if (Number(err.code) === pgErrors.UNIQUE_VIOLATION) {
           const matches = err.detail.match(/^.*\((.*)\)=\((.*)\).*$/);
-          throw new HttpError(409, `Could not create channel, ${matches[1]} must be unique`, 'EINVAL');
+          throw new HttpError(409, `Could not create channel with id, ${matches[1]} must be unique`, 'EINVAL');
         }
 
         throw err;
@@ -23,12 +24,12 @@ module.exports = function(knex) {
 
   function read() {
     return knex('channel')
-      .select('name', 'tags')
+      .select('id', 'name', 'tags')
       .limit(100)
       .then((dbResponse) => {
         return dbResponse.map((entry) => {
           return {
-            id: entry.name,
+            id: entry.id,
             name: entry.name,
             tags: entry.tags,
           };

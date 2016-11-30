@@ -36,7 +36,8 @@ describe('API', function() {
 
   beforeEach(function() {
     return database.channels.create({
-      name: 'testchannel',
+      id: 'testchannel',
+      name: 'test channel name',
       email: 'test@mozilla.com',
       tags: '',
     });
@@ -55,7 +56,8 @@ describe('API', function() {
           .set('Content-Type', 'application/json')
           .set('Authorization', authHeader)
           .send({
-            name: 'test',
+            id: 'test',
+            name: 'test name',
             email: 'test@example.com',
             tags: '',
           })
@@ -74,7 +76,7 @@ describe('API', function() {
           .expect('Content-Type', /application\/json/)
           .expect([{
             id: 'testchannel',
-            name: 'testchannel',
+            name: 'test channel name',
             tags: '',
           }]);
       });
